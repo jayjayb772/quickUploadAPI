@@ -32,6 +32,38 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+
+app.post('/upload-handshake', async (req, res) => {
+  try {
+    if(!req.files) {
+      res.send({
+        status: false,
+        message: 'No file uploaded'
+      });
+    } else {
+      //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+      let avatar = req.files.avatar;
+
+      //Use the mv() method to place the file in upload directory (i.e. "uploads")
+      avatar.mv('./uploads/' + avatar.name);
+
+      //send response
+      res.send({
+        status: true,
+        message: 'File is uploaded',
+        data: {
+          name: avatar.name,
+          mimetype: avatar.mimetype,
+          size: avatar.size
+        }
+      });
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
